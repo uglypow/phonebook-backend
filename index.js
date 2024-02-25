@@ -1,4 +1,6 @@
 const express = require('express')
+var morgan = require('morgan')
+
 const app = express()
 
 app.use(express.json())
@@ -25,6 +27,17 @@ let persons = [
         "number": "39-23-6423122"
     }
 ]
+
+morgan.token('body', req => {
+    const body = req.body
+    if (!body.name || !body.number || req.method !== 'POST') {
+        return ' '
+    }
+    return JSON.stringify(req.body)
+})
+const requestLogger = morgan(':method :url :status :res[content-length] - :response-time ms :body')
+
+app.use(requestLogger)
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
