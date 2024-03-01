@@ -10,7 +10,6 @@ app.use(express.static('dist'))
 app.use(express.json())
 
 morgan.token('body', req => {
-    const body = req.body
     return JSON.stringify(req.body)
 })
 const requestLogger = morgan(':method :url :status :res[content-length] - :response-time ms :body')
@@ -26,8 +25,8 @@ app.get('/api/persons', (request, response, next) => {
 })
 
 app.get('/api/info', (request, response, next) => {
-    const currentTime = new Date();
-    const formattedTime = currentTime.toUTCString();
+    const currentTime = new Date()
+    const formattedTime = currentTime.toUTCString()
 
     Person.find({})
         .then(persons => {
@@ -51,7 +50,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
-        .then(result => {
+        .then(() => {
             response.status(204).end()
         })
         .catch(error => next(error))
@@ -68,7 +67,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true, context: 'query' })
         .then(updatePerson => {
             if (!updatePerson) {
-                next(error)
+                next()
             }
             response.json(updatePerson)
         })
